@@ -105,7 +105,7 @@
                 <span>
             
                     
-                    Android 6.4.10
+                    Android 6.4.11
             
                 </span>
             
@@ -410,46 +410,42 @@
 <p>&#x5728; project-level build.gradle, &#x6DFB;&#x52A0; maven URL&#xFF1A;</p>
 <pre><code>allprojects {
   repositories {
-    maven {
-      url &apos;https://vungle.bintray.com/vungle-android-beta&apos;
-    }
+    jcenter()
   }
 }
 </code></pre><p>&#x5728; app-level build.gradle &#x6DFB;&#x52A0;&#x5982;&#x4E0B;&#x4F9D;&#x8D56;&#xFF1A;</p>
 <pre><code>dependencies { 
   // Vungle SDK
-  implementation &apos;vungle-android-beta:publisher-sdk-android:6.4.10&apos;
+  implementation &apos;com.vungle:publisher-sdk-android:6.4.11&apos;
 
   // Either appcompat-v7 or support-v4 is need for SDK operation 
   // Either
-  implementation &apos;com.android.support:appcompat-v7:27.1.1&apos;
+  implementation &apos;com.android.support:appcompat-v7:28.0.0&apos; 
   // Or
   implementation &apos;com.android.support:support-v4:27.1.1&apos;
 }
 </code></pre><h3 id="jar&#x96C6;&#x6210;">Jar&#x96C6;&#x6210;</h3>
 <p>&#x5982;&#x4F7F;&#x7528;Gradle&#x96C6;&#x6210;&#xFF0C;&#x8BF7;&#x8DF3;&#x8FC7;&#x8BE5;&#x90E8;&#x5206;&#x3002;&#x76F4;&#x63A5;&#x67E5;&#x770B;&#x521D;&#x59CB;&#x5316;Vungle SDK&#x90E8;&#x5206;&#x3002;</p>
-<p><img src="jar.jpg" alt="gras"></p>
+<p><img src="jar.png" alt="gras"></p>
 <p>&#x4E0B;&#x8F7D;SDK V6&#xFF0C;&#x89E3;&#x538B;&#x7F29;&#x653E;&#x5230;&#x5DE5;&#x7A0B;libs&#x6587;&#x4EF6;&#x5939;&#x4E0B;&#x3002;
 &#x5728; app-level build.gradle &#x6DFB;&#x52A0;&#x5982;&#x4E0B;&#x4F9D;&#x8D56;&#xFF1A;</p>
 <pre><code>dependencies {
     // Vungle SDK
-    compile files(&apos;libs/vungle-android-sdk-6.4.10.jar&apos;)
+  implementation files(&apos;libs/vungle-android-sdk-6.4.11.jar&apos;)
 
-    // Required Third-party Dependencies
-    implementation files(&apos;libs/converter-gson-2.5.0.jar&apos;)
-    implementation files(&apos;libs/gson-2.8.2.jar&apos;)
-    implementation files(&apos;libs/logging-interceptor-3.12.0.jar&apos;)
-    implementation files(&apos;libs/okhttp-3.12.0.jar&apos;)
-    implementation files(&apos;libs/okio-1.15.0.jar&apos;)
-    implementation files(&apos;libs/retrofit-2.5.0.jar&apos;)
-    implementation files(&apos;libs/VNG-moat-mobile-app-kit-2.5.1.jar&apos;) // JAR Integration only
+  // Required Third-party Dependencies
+  implementation files(&apos;libs/converter-gson-2.5.0.jar&apos;)
+  implementation files(&apos;libs/gson-2.8.2.jar&apos;)
+  implementation files(&apos;libs/logging-interceptor-3.12.0.jar&apos;)
+  implementation files(&apos;libs/okhttp-3.12.0.jar&apos;)
+  implementation files(&apos;libs/okio-1.15.0.jar&apos;)
+  implementation files(&apos;libs/retrofit-2.5.0.jar&apos;)
+  implementation files(&apos;libs/VNG-moat-mobile-app-kit-2.5.1.jar&apos;) // Exclude when using AAR
 
+  // Either appcompat-v7 or support-v4 is need for SDK operation 
+  implementation &apos;com.android.support:appcompat-v7:28.0.0&apos;  // Either
+  implementation &apos;com.android.support:support-v4:27.1.1&apos;    // Or
 
- // Either appcompat-v7 or support-v4 is need for SDK operation 
- // Either
- implementation &apos;com.android.support:appcompat-v7:27.1.1&apos;
-    // Or
-    compile &apos;com.android.support:support-v4:27.1.1&apos;
 }
 </code></pre><p>&#x4FEE;&#x6539;AndroidManifest.xml</p>
 <pre><code>&lt;!--Required Permissions--&gt;
@@ -508,71 +504,38 @@ catch(IllegalArgumentException e){
 <pre><code>boolean isInitialized = Vungle.isInitialized();
 </code></pre><h2 id="&#x9AD8;&#x7EA7;&#x8BBE;&#x7F6E;">&#x9AD8;&#x7EA7;&#x8BBE;&#x7F6E;</h2>
 <h3 id="proguard">ProGuard</h3>
-<pre><code> # Vungle
+<pre><code># Vungle
 -keep class com.vungle.warren.** { *; }
--dontwarn com.vungle.warren.error.VungleError$ErrorCode
-
 -keep class com.vungle.warren.downloader.DownloadRequest
+-dontwarn com.vungle.warren.error.VungleError$ErrorCode
 -dontwarn com.vungle.warren.downloader.DownloadRequest$Status
-
-# Google
--keep class com.google.android.gms.internal.** { *; }
--dontwarn com.google.android.gms.ads.identifier.**
+-keepclassmembers enum com.vungle.warren.** { *; }
 
 # Moat SDK
 -keep class com.moat.** { *; }
 -dontwarn com.moat.**
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+-keepattributes *Annotation*
 
 # Retrofit
--dontwarn okio.**
--dontwarn retrofit2.Platform$Java8
-
+-keepattributes Signature, InnerClasses
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
-
-# JSR 305 annotations are for embedding nullability information.
 -dontwarn javax.annotation.**
-
-# A resource is loaded with a relative path so the package of this class must be preserved.
--keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
-
-# Animal Sniffer compileOnly dependency to ensure APIs are compatible with older versions of Java.
--dontwarn org.codehaus.mojo.animal_sniffer.*
-
-# OkHttp platform used only on JVM and when Conscrypt dependency is available.
--dontwarn okhttp3.internal.platform.ConscryptPlatform
-
-## Retrofit2
-# Retrofit does reflection on generic parameters. InnerClasses is required to use Signature and
-# EnclosingMethod is required to use InnerClasses.
--keepattributes Signature, InnerClasses, EnclosingMethod
-
-# Retrofit does reflection on method and parameter annotations.
--keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
-
-# Retain service method parameters when optimizing.
+-dontwarn kotlin.Unit
+-dontwarn retrofit2.-KotlinExtensions
 -keepclassmembers,allowshrinking,allowobfuscation interface * {
     @retrofit2.http.* &lt;methods&gt;;
 }
 
-# Ignore annotation used for build tooling.
--dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
-
-# Ignore JSR 305 annotations for embedding nullability information.
+# Okio+OkHttp
+-dontwarn okhttp3.**
+-dontwarn okio.**
 -dontwarn javax.annotation.**
-
--dontwarn kotlin.reflect.jvm.internal.**
--keep class kotlin.reflect.jvm.internal.** { *; }
-
-# Guarded by a NoClassDefFoundError try/catch and only used when on the classpath.
--dontwarn kotlin.Unit
-
-# Top-level functions that can only be used by Kotlin.
--dontwarn retrofit2.KotlinExtensions
-
-# With R8 full mode, it sees no subtypes of Retrofit interfaces since they are created with a Proxy
-# and replaces all potential values with null. Explicitly keeping the interfaces prevents this.
--if interface * { @retrofit2.http.* &lt;methods&gt;; }
--keep,allowobfuscation interface &lt;1&gt;
+-dontwarn org.conscrypt.**
+-keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
+-keepclassmembers class * extends com.vungle.warren.persistence.Memorable {
+   public &lt;init&gt;(byte[]);
+}
 </code></pre><h3 id="gdpr">GDPR</h3>
 <p>&#x300A;&#x901A;&#x7528;&#x6570;&#x636E;&#x4FDD;&#x62A4;&#x6761;&#x4F8B;&#x300B;(GDPR) &#x5C06;&#x4E8E; 5 &#x6708; 25 &#x65E5;&#x5728;&#x6B27;&#x76DF;&#x751F;&#x6548;&#x3002;&#x4E3A;&#x4E86;&#x9075;&#x5B88; GDPR&#xFF0C;Vungle&#x63D0;&#x4F9B;&#x4E86;&#x5982;&#x4E0B;&#x65B9;&#x6CD5;&#x3002;
 The consentMessageVersion indicates publisher controlled consent policy version to allow publisher getting consent again when GDPR policy changes by pooling users by the message version.</p>
@@ -626,7 +589,7 @@ String consentMessageVersion = Vungle.getConsentMessageVersion();
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"开始集成","level":"1.2.1","depth":2,"next":{"title":"Reward奖励广告","level":"1.2.2","depth":2,"path":"Android/Reward.md","ref":"Android/Reward.md","articles":[]},"previous":{"title":"Android 6.4.10","level":"1.2","depth":1,"ref":"","articles":[{"title":"开始集成","level":"1.2.1","depth":2,"path":"Android/GetStarted.md","ref":"Android/GetStarted.md","articles":[]},{"title":"Reward奖励广告","level":"1.2.2","depth":2,"path":"Android/Reward.md","ref":"Android/Reward.md","articles":[]},{"title":"Interstitial 插屏","level":"1.2.3","depth":2,"path":"Android/Interstitial.md","ref":"Android/Interstitial.md","articles":[]},{"title":"InFeed 信息流","level":"1.2.4","depth":2,"path":"Android/InFeed.md","ref":"Android/InFeed.md","articles":[]},{"title":"MREC","level":"1.2.5","depth":2,"path":"Android/MREC.md","ref":"Android/MREC.md","articles":[]}]},"dir":"ltr"},"config":{"plugins":[],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","author":"Vincent Yao","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Vungle 6.4 集成文档","language":"cn","gitbook":"*"},"file":{"path":"Android/GetStarted.md","mtime":"2019-04-22T03:25:59.393Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-05-22T03:31:12.329Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"开始集成","level":"1.2.1","depth":2,"next":{"title":"Reward奖励广告","level":"1.2.2","depth":2,"path":"Android/Reward.md","ref":"Android/Reward.md","articles":[]},"previous":{"title":"Android 6.4.11","level":"1.2","depth":1,"ref":"","articles":[{"title":"开始集成","level":"1.2.1","depth":2,"path":"Android/GetStarted.md","ref":"Android/GetStarted.md","articles":[]},{"title":"Reward奖励广告","level":"1.2.2","depth":2,"path":"Android/Reward.md","ref":"Android/Reward.md","articles":[]},{"title":"Interstitial 插屏","level":"1.2.3","depth":2,"path":"Android/Interstitial.md","ref":"Android/Interstitial.md","articles":[]},{"title":"InFeed 信息流","level":"1.2.4","depth":2,"path":"Android/InFeed.md","ref":"Android/InFeed.md","articles":[]},{"title":"MREC","level":"1.2.5","depth":2,"path":"Android/MREC.md","ref":"Android/MREC.md","articles":[]}]},"dir":"ltr"},"config":{"plugins":[],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","author":"Vincent Yao","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Vungle 6.4 集成文档","language":"cn","gitbook":"*"},"file":{"path":"Android/GetStarted.md","mtime":"2019-07-25T03:00:18.191Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-07-25T03:02:04.039Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
